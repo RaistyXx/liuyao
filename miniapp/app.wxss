@@ -1,0 +1,7 @@
+page {
+  font-family: "Noto Serif SC", "STSong", "SimSun", serif;
+  background: #faf8f3;
+  color: #1f1f1f;
+  font-size: 16px;
+  line-height: 1.85;
+}

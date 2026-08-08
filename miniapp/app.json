@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "六爻占卜",
+    "navigationBarBackgroundColor": "#1c1915",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#faf8f3"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

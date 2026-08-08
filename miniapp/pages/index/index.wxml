@@ -1,0 +1,210 @@
+<!-- 顶部导航栏下的主体 -->
+<scroll-view scroll-y class="main-scroll">
+  <!-- 登录/注册按钮 -->
+  <view class="header-auth">
+    <block wx:if="{{currentUser}}">
+      <text class="user-badge"><text class="dot"></text>{{currentUser}}</text>
+      <button class="btn-auth-sm" bindtap="logout">退出</button>
+    </block>
+    <block wx:else>
+      <button class="btn-auth-primary" bindtap="showLogin">微信登录</button>
+    </block>
+  </view>
+
+  <!-- Header -->
+  <view class="header">
+    <view class="title">六 爻 占 卜</view>
+    <view class="subtitle">周易六十四卦 · 金钱课法</view>
+    <view class="badge">三枚铜钱 · 抛掷六次 · 自下而上成卦</view>
+  </view>
+
+  <!-- 占卜之法 -->
+  <view class="method-section">
+    <view class="method-title"><text class="line"></text> 占 卜 之 法 <text class="line"></text></view>
+    <view class="method-grid">
+      <view class="method-step">
+        <view class="step-num">1</view>
+        <view class="step-title">静心凝神</view>
+        <view class="step-desc">心中默念所问之事，排除杂念</view>
+      </view>
+      <view class="method-step">
+        <view class="step-num">2</view>
+        <view class="step-title">摇钱起卦</view>
+        <view class="step-desc">取三枚铜钱，合于掌中抛掷</view>
+      </view>
+      <view class="method-step">
+        <view class="step-num">3</view>
+        <view class="step-title">六次成卦</view>
+        <view class="step-desc">共抛六次，自下而上成卦</view>
+      </view>
+      <view class="method-step">
+        <view class="step-num">4</view>
+        <view class="step-title">观象玩辞</view>
+        <view class="step-desc">观卦象，读彖辞，明吉凶</view>
+      </view>
+    </view>
+    <view class="rules-note">
+      <text class="rules-title">爻象判定：</text>三枚铜钱，字面为阴(值2)，背面为阳(值3)\n三面皆阳=9老阳○  两阳一阴=8少阴\n三面皆阴=6老阴×  两阴一阳=7少阳
+    </view>
+  </view>
+
+  <!-- 抛掷区域 -->
+  <view class="toss-area">
+    <!-- 六爻进度圆点 -->
+    <view class="toss-dots">
+      <view class="toss-dot {{tossProgress[i] === 'completed' ? 'completed' : ''}} {{tossProgress[i] === 'current' ? 'current' : ''}} {{changingDots[i] ? 'changing' : ''}}" wx:for="{{['初','二','三','四','五','上']}}" wx:key="*this">{{item}}</view>
+    </view>
+
+    <!-- 大铜钱 -->
+    <view class="coin-display" bindtap="tossCoin" hidden="{{tossCount >= 6}}">
+      <view class="coin {{flipping ? 'flipping' : ''}} {{coinResultFace}}">
+        <view class="face heads"><text>☰</text><text class="face-label">阳</text></view>
+        <view class="face tails"><text>☷</text><text class="face-label">阴</text></view>
+      </view>
+    </view>
+
+    <!-- 三枚小铜钱结果 -->
+    <view class="coin-results" wx:if="{{lastCoins.length > 0}}">
+      <view class="coin-mini {{c === 1 ? 'heads' : 'tails'}} {{showCoinResults ? 'show' : ''}}" wx:for="{{lastCoins}}" wx:key="index" style="transition-delay:{{index * 0.15}}s">
+        {{c === 1 ? '☰' : '☷'}}
+      </view>
+    </view>
+
+    <!-- 抛掷按钮 -->
+    <button class="btn-toss" bindtap="tossCoin" disabled="{{tossCount >= 6 || flipping}}">
+      抛 掷 铜 钱
+    </button>
+    <view class="toss-status">{{tossStatus}}</view>
+  </view>
+
+  <!-- 结果区域 -->
+  <view class="result-section" wx:if="{{showResult}}">
+    <view class="hex-title">{{hexName}}</view>
+    <view class="hex-subtitle">{{hexPinyin}} · {{upperTri}}上{{lowerTri}}下</view>
+
+    <!-- 六爻线 -->
+    <view class="hex-lines">
+      <view class="hex-line" wx:for="{{hexLines}}" wx:key="index">
+        <text class="line-label">{{item.label}}</text>
+        <view wx:if="{{item.yang}}" class="line-bar yang {{item.changing ? 'changing-line' : ''}}"></view>
+        <view wx:else class="line-bar yin {{item.changing ? 'changing-line' : ''}}">
+          <view class="yin-half"></view>
+          <view class="yin-half"></view>
+        </view>
+        <text class="change-indicator" wx:if="{{item.changing}}">{{item.yang ? '○ 变' : '× 变'}}</text>
+        <text class="change-indicator" wx:else></text>
+      </view>
+    </view>
+
+    <view class="change-info" wx:if="{{hasChanged}}">
+      变卦：<text style="color:#5a7a6a;font-weight:600">{{changedHexName}}</text>（{{changingCount}}个变爻：{{changingNames}}）
+    </view>
+    <view class="change-info" wx:else>本卦无变爻，为静卦</view>
+
+    <!-- 解读卡片 -->
+    <view class="interp-card">
+      <view class="card-title">卦 辞</view>
+      <view class="card-body"><text class="label">{{hexName}}</text>{{judgment}}</view>
+    </view>
+    <view class="interp-card">
+      <view class="card-title">大 象</view>
+      <view class="card-body">{{image}}</view>
+    </view>
+    <view class="interp-card">
+      <view class="card-title">解 卦</view>
+      <view class="card-body">{{interpret}}</view>
+    </view>
+
+    <!-- 变爻解读 -->
+    <view class="interp-card" wx:if="{{changingLines.length > 0}}">
+      <view class="card-title">变 爻 解 读</view>
+      <view class="changing-note" wx:for="{{changingLines}}" wx:key="index">
+        <text class="changing-label">【{{item.label}}爻变】</text>{{item.text}}
+      </view>
+    </view>
+
+    <!-- 变卦信息 -->
+    <view class="interp-card changed-hex" wx:if="{{hasChanged && changedHex}}">
+      <view class="card-title">变 卦 | {{changedHexName}}</view>
+      <view class="card-body"><text class="label">卦辞</text>{{changedHex.judgment}}</view>
+      <view class="card-body" style="margin-top:8px"><text class="label">大象</text>{{changedHex.image}}</view>
+      <view class="card-body" style="margin-top:8px">{{changedHex.interpret}}</view>
+    </view>
+
+    <!-- 六爻爻辞 -->
+    <view class="interp-card">
+      <view class="card-title">六 爻 爻 辞</view>
+      <view class="line-text {{item.changing ? 'line-highlight' : ''}}" wx:for="{{allLineTexts}}" wx:key="index">{{item.text}}</view>
+    </view>
+
+    <button class="btn-toss btn-reset" bindtap="resetDivination">重 新 占 卜</button>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!showResult && tossCount === 0}}">
+    <view class="bagua-row">
+      <text>☰</text><text>☷</text><text>☵</text><text>☲</text>
+      <text>☳</text><text>☶</text><text>☱</text><text>☴</text>
+    </view>
+    <view class="empty-text">三枚铜钱定乾坤，六次抛掷见天机\n点击上方铜钱，开始您的问卦之旅</view>
+  </view>
+
+  <view class="footer">
+    六爻占卜 · 周易六十四卦 · 传统文化数字复兴\n《易》之为书也不可远，为道也屡迁，变动不居，周流六虚
+  </view>
+</scroll-view>
+
+<!-- ====== 微信登录弹窗 ====== -->
+<view class="modal-mask" wx:if="{{showAuthModal}}" bindtap="closeAuthModal"></view>
+<view class="modal-box" wx:if="{{showAuthModal}}">
+  <view class="wx-login-title">微 信 登 录</view>
+  <view class="wx-login-desc">授权登录后，您的占卜记录将云端保存</view>
+  <button class="wx-login-btn" bindtap="handleWechatLogin" loading="{{authLoading}}">
+    微信一键登录
+  </button>
+  <view class="wx-login-cancel" bindtap="closeAuthModal">暂不登录</view>
+</view>
+
+<!-- ====== 侧边栏（历史记录） ====== -->
+<view class="drawer-mask" wx:if="{{showDrawer}}" bindtap="closeDrawer"></view>
+<view class="drawer {{showDrawer ? 'open' : ''}}">
+  <view class="drawer-header">
+    <view class="drawer-title">占 卜 记 录</view>
+    <view class="drawer-subtitle">— 周易六十四卦 —</view>
+  </view>
+
+  <!-- 需要登录 -->
+  <view class="drawer-locked" wx:if="{{!currentUser}}">
+    <view class="locked-text">微信登录后可查看\n占卜记录</view>
+    <button class="btn-auth-sm" bindtap="showLogin">微信登录</button>
+  </view>
+
+  <!-- 已登录 -->
+  <block wx:else>
+    <view class="drawer-user-row">
+      <view class="user-avatar">{{currentUser[0]}}</view>
+      <view class="user-name">{{currentUser}}</view>
+      <button class="btn-logout" bindtap="logout">退出</button>
+    </view>
+    <scroll-view scroll-y class="drawer-list">
+      <block wx:if="{{history.length === 0}}">
+        <view class="history-empty">尚无占卜记录\n点击铜钱开始问卦</view>
+      </block>
+      <view class="history-item {{item.id === currentReadingId ? 'active' : ''}}" wx:for="{{history}}" wx:key="id" bindtap="loadRecord" data-id="{{item.id}}">
+        <view class="hi-date">{{item.date}}</view>
+        <view class="hi-name">{{item.hexName}}</view>
+        <view class="hi-summary">{{item.summary}}</view>
+        <view class="hi-del" catchtap="deleteRecord" data-id="{{item.id}}">✕</view>
+      </view>
+    </scroll-view>
+    <view class="drawer-footer">
+      <button class="btn-clear" bindtap="clearAll">清除所有记录</button>
+    </view>
+  </block>
+</view>
+
+<!-- 浮动按钮：打开历史侧边栏 -->
+<view class="float-btn" bindtap="openDrawer">☰</view>
+
+<!-- Toast -->
+<view class="toast {{showToast ? 'toast-show' : ''}}">{{toastMsg}}</view>

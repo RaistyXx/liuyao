@@ -52,7 +52,7 @@
   <view class="toss-area">
     <!-- 六爻进度圆点 -->
     <view class="toss-dots">
-      <view class="toss-dot {{tossProgress[i] === 'completed' ? 'completed' : ''}} {{tossProgress[i] === 'current' ? 'current' : ''}} {{changingDots[i] ? 'changing' : ''}}" wx:for="{{['初','二','三','四','五','上']}}" wx:key="*this">{{item}}</view>
+      <view class="toss-dot {{tossProgress[index] === 'completed' ? 'completed' : ''}} {{tossProgress[index] === 'current' ? 'current' : ''}} {{changingDots[index] ? 'changing' : ''}}" wx:for="{{['初','二','三','四','五','上']}}" wx:key="*this">{{item}}</view>
     </view>
 
     <!-- 大铜钱 -->
@@ -65,9 +65,7 @@
 
     <!-- 三枚小铜钱结果 -->
     <view class="coin-results" wx:if="{{lastCoins.length > 0}}">
-      <view class="coin-mini {{c === 1 ? 'heads' : 'tails'}} {{showCoinResults ? 'show' : ''}}" wx:for="{{lastCoins}}" wx:key="index" style="transition-delay:{{index * 0.15}}s">
-        {{c === 1 ? '☰' : '☷'}}
-      </view>
+      <view class="coin-mini {{item === 1 ? 'heads' : 'tails'}} {{showCoinResults ? 'show' : ''}}" wx:for="{{lastCoins}}" wx:key="index">{{item === 1 ? '☰' : '☷'}}</view>
     </view>
 
     <!-- 抛掷按钮 -->

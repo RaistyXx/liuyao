@@ -886,12 +886,20 @@ const dom = {
   sidebarFooter: $('#sidebarFooter'),
 };
 
+// ==================== SUPABASE ====================
+const SUPABASE_URL = 'https://cqvjwvasdpyaxpdareog.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_vITIrKzP34JFAifsiUXHvg_b3sOb2-A';
+const SUPABASE_HEADERS = {
+  'apikey': SUPABASE_KEY,
+  'Authorization': 'Bearer ' + SUPABASE_KEY,
+  'Content-Type': 'application/json'
+};
+
 // ==================== AUTH ====================
 const AUTH_KEY = 'liuyao_auth';
-let currentUser = null; // {username: string}
+let currentUser = null;
 
 function hash(str) {
-  // simple hash for localStorage demo
   let h = 0;
   for (let i = 0; i < str.length; i++) {
     const c = str.charCodeAt(i);
@@ -901,47 +909,51 @@ function hash(str) {
   return 'lv_' + Math.abs(h).toString(36);
 }
 
-function getUsers() {
-  try { return JSON.parse(localStorage.getItem('liuyao_users') || '{}'); } catch(e) { return {}; }
-}
-function saveUsers(users) {
-  localStorage.setItem('liuyao_users', JSON.stringify(users));
-}
-
-function handleRegister(e) {
+async function handleRegister(e) {
   e.preventDefault();
   const name = $('#regUser').value.trim();
   const pass = $('#regPass').value;
   const err = $('#regError');
   err.textContent = '';
   if (name.length < 4) { err.textContent = '用户名至少4位'; return; }
-  const users = getUsers();
-  if (users[name]) { err.textContent = '用户名已存在'; return; }
-  users[name] = hash(pass);
-  saveUsers(users);
-  loginAs(name);
+  try {
+    // check if username exists
+    const check = await fetch(`${SUPABASE_URL}/rest/v1/liuyao_users?username=eq.${encodeURIComponent(name)}&select=username`, { headers: SUPABASE_HEADERS });
+    const existing = await check.json();
+    if (existing.length > 0) { err.textContent = '用户名已存在'; return; }
+    // insert new user
+    await fetch(`${SUPABASE_URL}/rest/v1/liuyao_users`, {
+      method: 'POST',
+      headers: { ...SUPABASE_HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ username: name, password_hash: hash(pass) })
+    });
+  } catch(e) { err.textContent = '网络异常，请重试'; return; }
+  await loginAs(name);
   closeAuthModal();
   showToast('注册成功');
 }
 
-function handleLogin(e) {
+async function handleLogin(e) {
   e.preventDefault();
   const name = $('#loginUser').value.trim();
   const pass = $('#loginPass').value;
   const err = $('#loginError');
   err.textContent = '';
-  const users = getUsers();
-  if (!users[name]) { err.textContent = '用户不存在'; return; }
-  if (users[name] !== hash(pass)) { err.textContent = '密码错误'; return; }
-  loginAs(name);
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/liuyao_users?username=eq.${encodeURIComponent(name)}&select=username,password_hash`, { headers: SUPABASE_HEADERS });
+    const users = await res.json();
+    if (users.length === 0) { err.textContent = '用户不存在'; return; }
+    if (users[0].password_hash !== hash(pass)) { err.textContent = '密码错误'; return; }
+  } catch(e) { err.textContent = '网络异常，请重试'; return; }
+  await loginAs(name);
   closeAuthModal();
   showToast('欢迎回来，' + name);
 }
 
-function loginAs(username) {
+async function loginAs(username) {
   currentUser = username;
   localStorage.setItem(AUTH_KEY, username);
-  STATE.history = loadUserHistory();
+  STATE.history = await loadUserHistory();
   updateAuthUI();
   renderHistory();
 }
@@ -955,20 +967,39 @@ function logout() {
   showToast('已退出登录');
 }
 
-function loadUserHistory() {
+async function loadUserHistory() {
   if (!currentUser) return [];
-  try { return JSON.parse(localStorage.getItem('liuyao_records_' + currentUser) || '[]'); } catch(e) { return []; }
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/liuyao_records?username=eq.${encodeURIComponent(currentUser)}&select=record_data&order=created_at.asc`, { headers: SUPABASE_HEADERS });
+    const rows = await res.json();
+    return rows.map(r => r.record_data);
+  } catch(e) { return []; }
+}
+
+async function saveHistory() {
+  if (!currentUser) return;
+  try {
+    // delete all existing records for this user, then re-insert
+    await fetch(`${SUPABASE_URL}/rest/v1/liuyao_records?username=eq.${encodeURIComponent(currentUser)}`, {
+      method: 'DELETE', headers: SUPABASE_HEADERS
+    });
+    for (const record of STATE.history) {
+      await fetch(`${SUPABASE_URL}/rest/v1/liuyao_records`, {
+        method: 'POST',
+        headers: { ...SUPABASE_HEADERS, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ username: currentUser, record_data: record })
+      });
+    }
+  } catch(e) {}
 }
 
 function updateAuthUI() {
   const loggedIn = !!currentUser;
-  // header
   dom.headerAuth.innerHTML = loggedIn
     ? `<span class="user-badge"><span class="dot"></span>${currentUser}</span>
        <button class="btn-auth" onclick="logout()">退出</button>`
     : `<button class="btn-auth" onclick="showAuthModal('login')">登录</button>
        <button class="btn-auth primary" onclick="showAuthModal('register')">注册</button>`;
-  // sidebar
   dom.sidebarUserRow.style.display = loggedIn ? 'flex' : 'none';
   dom.sidebarLocked.style.display = loggedIn ? 'none' : 'flex';
   dom.historyList.style.display = loggedIn ? '' : 'none';
@@ -993,22 +1024,22 @@ function switchAuthTab(tab) {
 }
 
 // ==================== INIT ====================
-function init() {
+async function init() {
   dom.tossDots = $$('.toss-dot');
-  // restore session
   const saved = localStorage.getItem(AUTH_KEY);
   if (saved) {
-    const users = getUsers();
-    if (users[saved]) { loginAs(saved); } else { localStorage.removeItem(AUTH_KEY); }
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/liuyao_users?username=eq.${encodeURIComponent(saved)}&select=username`, { headers: SUPABASE_HEADERS });
+      const users = await res.json();
+      if (users.length > 0) { await loginAs(saved); } else { localStorage.removeItem(AUTH_KEY); }
+    } catch(e) {}
   }
   updateAuthUI();
   renderHistory();
   updateTossUI();
-  // auth modal tab switching
   document.querySelectorAll('.auth-tab').forEach(tab => {
     tab.addEventListener('click', () => switchAuthTab(tab.dataset.tab));
   });
-  // close auth modal on overlay click
   dom.authModal.addEventListener('click', function(e) {
     if (e.target === this) closeAuthModal();
   });
@@ -1089,11 +1120,6 @@ function loadHistoryReading(id) {
   dom.resultSection.classList.add('visible');
   dom.emptyState.style.display = 'none';
   document.getElementById('resultSection').scrollIntoView({behavior:'smooth'});
-}
-
-function saveHistory() {
-  if (!currentUser) return;
-  localStorage.setItem('liuyao_records_' + currentUser, JSON.stringify(STATE.history));
 }
 
 // ==================== COIN TOSS ====================

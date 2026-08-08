@@ -137,19 +137,37 @@ Page({
     this.setData({ authLoading: true });
     wx.login({
       success: res => {
-        // Use wx.login code hash as persistent device ID
-        // TODO: deploy supabase edge function to exchange code for real openid
-        let deviceId = wx.getStorageSync('liuyao_device_id');
-        if (!deviceId) {
-          deviceId = 'wx_' + (res.code ? res.code.slice(0, 16) : Date.now().toString(36));
-          wx.setStorageSync('liuyao_device_id', deviceId);
-        }
-        this._loginAs(deviceId);
-        this.setData({ showAuthModal: false, authLoading: false });
-        this._toast('登录成功');
+        if (!res.code) { this.setData({ authLoading: false }); return; }
+        wx.request({
+          url: `${SUPABASE_URL}/functions/v1/wechat-login`,
+          method: 'POST',
+          header: { ...HEADERS, 'Content-Type': 'application/json' },
+          data: { code: res.code },
+          success: resp => {
+            if (resp.statusCode === 200 && resp.data && resp.data.openid) {
+              this._loginAs(resp.data.openid);
+              this.setData({ showAuthModal: false, authLoading: false });
+              this._toast('微信登录成功');
+            } else {
+              this._fallbackLogin();
+            }
+          },
+          fail: () => this._fallbackLogin()
+        });
       },
       fail: () => this.setData({ authLoading: false })
     });
+  },
+
+  _fallbackLogin() {
+    let deviceId = wx.getStorageSync('liuyao_device_id');
+    if (!deviceId) {
+      deviceId = 'wx_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      wx.setStorageSync('liuyao_device_id', deviceId);
+    }
+    this._loginAs(deviceId);
+    this.setData({ showAuthModal: false, authLoading: false });
+    this._toast('登录成功');
   },
 
   _loginAs(uid) {

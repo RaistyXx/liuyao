@@ -138,33 +138,38 @@ Page({
     wx.login({
       success: res => {
         if (!res.code) { this.setData({ authLoading: false }); return; }
-        // Exchange code for openid via Supabase Edge Function
         wx.request({
           url: `${SUPABASE_URL}/functions/v1/wechat-login`,
           method: 'POST',
           header: { ...HEADERS, 'Content-Type': 'application/json' },
           data: { code: res.code },
           success: resp => {
-            if (resp.data.openid) {
+            if (resp.statusCode === 200 && resp.data && resp.data.openid) {
               this._loginAs(resp.data.openid);
               this.setData({ showAuthModal: false, authLoading: false });
-              this._toast('登录成功');
+              this._toast('微信登录成功');
             } else {
-              this.setData({ authLoading: false });
-              this._toast('登录失败，请重试');
+              // Edge function not deployed or returned error — fallback
+              this._fallbackLogin();
             }
           },
-          fail: () => {
-            // Edge function not deployed yet — fallback to device ID
-            const deviceId = 'wx_' + Date.now().toString(36);
-            this._loginAs(deviceId);
-            this.setData({ showAuthModal: false, authLoading: false });
-            this._toast('已登录（需部署后端获取微信信息）');
-          }
+          fail: () => this._fallbackLogin()
         });
       },
       fail: () => this.setData({ authLoading: false })
     });
+  },
+
+  _fallbackLogin() {
+    // Use device-based ID until edge function is deployed
+    let deviceId = wx.getStorageSync('liuyao_device_id');
+    if (!deviceId) {
+      deviceId = 'wx_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      wx.setStorageSync('liuyao_device_id', deviceId);
+    }
+    this._loginAs(deviceId);
+    this.setData({ showAuthModal: false, authLoading: false });
+    this._toast('登录成功');
   },
 
   _loginAs(uid) {

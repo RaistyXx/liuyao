@@ -3,464 +3,360 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>六爻占卜 — 周易卦象</title>
+<title>六爻占卜</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-/* ===== Reset & Base ===== */
+/* ================================================================
+   六爻占卜 · LIU YAO / I CHING · 赛博时尚 Cyber-Streetwear
+   黑底 + 荧光 · 超大加粗排版 · 模块化面板
+   ================================================================ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#faf8f3;--bg-card:#fff;--text:#1f1f1f;--text-muted:#777;
-  --accent:#933;--accent-hover:#b44;--gold:#8b7355;--gold-light:#b8976a;
-  --border:#e6dfd4;--sidebar-bg:#1c1915;--sidebar-text:#b0a395;
-  --sidebar-active:rgba(255,255,255,0.08);--jade:#5a7a6a;
-  --shadow-sm:0 1px 3px rgba(0,0,0,0.06);
-  --shadow-md:0 4px 16px rgba(0,0,0,0.07);
-  --shadow-lg:0 8px 32px rgba(0,0,0,0.10);
-  --radius-sm:8px;--radius:12px;--radius-lg:16px;
-  --font:"Noto Serif SC","Source Han Serif SC","STSong","SimSun",serif;
-  --sidebar-width:272px;
+  --bg:#0a0b0d;
+  --bg-2:#101114;
+  --bg-3:#14161a;
+  --panel:#15171b;
+  --panel-2:#1b1e23;
+  --ink:#f2f3ef;
+  --ink-2:#c2c6cb;
+  --ink-3:#88907a;
+  --ink-dim:#565c5f;
+  --line:rgba(244,246,240,.10);
+  --line-2:rgba(244,246,240,.20);
+  --neon:#c8f542;
+  --neon-2:#aef030;
+  --neon-soft:rgba(200,245,66,.16);
+  --violet:#9b6bff;
+  --pink:#f4539d;
+  --cyan:#41e8d6;
+  --red:#ff3d3d;
+  --font-display:"Anton","Noto Sans SC",sans-serif;
+  --font-ui:"Space Grotesk","Noto Sans SC","Microsoft YaHei",sans-serif;
+  --font-mono:"Space Mono","Noto Sans SC",monospace;
+  --accent:var(--neon);
+  --text-muted:var(--ink-3);
+  --jade:var(--cyan);
+  --sidebar-width:268px;
 }
 html{font-size:16px;scroll-behavior:smooth}
 body{
-  font-family:var(--font);background:var(--bg);color:var(--text);
-  min-height:100vh;line-height:1.85;-webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
+  font-family:var(--font-ui);color:var(--ink);min-height:100vh;line-height:1.7;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative;
+  background:var(--bg);
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),
+    radial-gradient(120% 90% at 80% 0%,rgba(200,245,66,.10),transparent 55%),
+    radial-gradient(60% 60% at 6% 30%,rgba(155,107,255,.08),transparent 60%);
+  background-size:44px 44px,44px 44px,100% 100%,100% 100%;
 }
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:#aaa}
+::selection{background:var(--neon);color:#000}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:var(--neon)}
+:focus-visible{outline:2px solid var(--neon);outline-offset:3px;border-radius:4px}
+.scene{display:none}
 
-/* ===== Sidebar ===== */
-.sidebar{
-  position:fixed;left:0;top:0;width:var(--sidebar-width);height:100vh;
-  background:var(--sidebar-bg);z-index:100;display:flex;flex-direction:column;
-  transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);
-  border-right:1px solid rgba(255,255,255,0.06);
-}
-.sidebar-header{
-  padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.06);
-  flex-shrink:0;
-}
-.sidebar-header h2{
-  color:#d4c5b0;font-size:1.15rem;font-weight:600;letter-spacing:0.12em;
-  display:flex;align-items:center;gap:8px;
-}
-.sidebar-header h2::before{
-  content:'';display:inline-block;width:4px;height:18px;
-  background:var(--accent);border-radius:2px;
-}
-.sidebar-header .subtitle{
-  color:rgba(255,255,255,0.3);font-size:0.68rem;letter-spacing:0.25em;
-  margin-top:4px;text-transform:uppercase;
-}
-.sidebar-locked{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;text-align:center}
-.sidebar-locked p{color:rgba(255,255,255,0.25);font-size:0.78rem;line-height:2}
-.sidebar-locked .btn-auth{display:inline-block;margin-top:12px;padding:8px 24px;background:var(--accent);color:#fff;border:none;border-radius:20px;font-size:0.78rem;font-family:var(--font);cursor:pointer;letter-spacing:0.06em;transition:all 0.2s}
-.sidebar-locked .btn-auth:hover{background:var(--accent-hover)}
-.sidebar-user-row{display:flex;align-items:center;gap:8px;padding:10px 18px;border-bottom:1px solid rgba(255,255,255,0.06)}
-.sidebar-user-row .user-avatar{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;flex-shrink:0}
-.sidebar-user-row .user-name{color:#c8b898;font-size:0.8rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sidebar-user-row .btn-logout-sm{background:none;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.4);padding:2px 10px;border-radius:10px;cursor:pointer;font-size:0.6rem;font-family:var(--font);transition:all 0.2s}
-.sidebar-user-row .btn-logout-sm:hover{color:#c66;border-color:rgba(200,100,100,0.3)}
+/* ============ 顶部导航条 ============ */
+.topbar{position:fixed;top:0;left:0;right:0;height:46px;z-index:400;display:flex;align-items:center;justify-content:space-between;padding:0 22px;background:rgba(10,11,13,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.tb-brand{font-family:var(--font-display);letter-spacing:.06em;font-size:1.05rem;color:var(--ink);display:flex;align-items:center;gap:10px;text-transform:uppercase}
+.tb-brand .dot{width:9px;height:9px;border-radius:2px;background:var(--neon);box-shadow:0 0 12px var(--neon)}
+.tb-brand span{color:var(--neon)}
+.tb-meta{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase}
+.tb-meta b{color:var(--ink-2);font-weight:400}
 
-/* Auth Modal */
-.auth-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:20px}
-.auth-tab{flex:1;text-align:center;padding:10px;cursor:pointer;font-size:0.9rem;color:var(--text-muted);transition:all 0.2s;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;background:none;font-family:var(--font)}
-.auth-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
-.auth-form{display:none;flex-direction:column;gap:12px}
-.auth-form.active{display:flex}
-.auth-form input{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.9rem;font-family:var(--font);background:var(--bg);color:var(--text);outline:none}
-.auth-form input:focus{border-color:var(--accent)}
-.auth-form .btn-submit{width:100%;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-size:0.9rem;font-family:var(--font);cursor:pointer;letter-spacing:0.06em;transition:all 0.2s}
-.auth-form .btn-submit:hover{background:var(--accent-hover)}
-.auth-form .auth-error{color:#c44;font-size:0.75rem;text-align:center;min-height:18px}
-.sidebar-history{flex:1;overflow-y:auto;padding:10px 14px}
-.sidebar-history::-webkit-scrollbar{width:3px}
-.sidebar-history::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
-
-.history-item{
-  padding:12px 14px;margin-bottom:6px;border-radius:var(--radius-sm);
-  cursor:pointer;transition:all 0.25s;position:relative;
-  border:1px solid transparent;
-}
-.history-item:hover{background:var(--sidebar-active)}
-.history-item.active{
-  background:var(--sidebar-active);
-  border-color:rgba(255,255,255,0.08);
-}
-.history-item .hi-date{color:rgba(255,255,255,0.3);font-size:0.65rem;margin-bottom:3px;letter-spacing:0.04em}
-.history-item .hi-name{color:#c8b898;font-size:0.9rem;font-weight:600}
-.history-item .hi-summary{color:rgba(255,255,255,0.35);font-size:0.68rem;margin-top:2px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.history-item .hi-delete{
-  position:absolute;top:8px;right:10px;background:none;border:none;
-  color:rgba(255,255,255,0.18);cursor:pointer;font-size:0.85rem;
-  transition:color 0.25s;padding:0;line-height:1;
-}
-.history-item .hi-delete:hover{color:#c44}
-.history-empty{
-  text-align:center;color:rgba(255,255,255,0.2);padding:48px 20px;
-  font-size:0.8rem;line-height:2.2;
-}
-
-.sidebar-footer{
-  padding:14px 18px;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;
-}
-.sidebar-footer .btn-clear{
-  width:100%;background:transparent;color:rgba(255,255,255,0.3);
-  border:1px solid rgba(255,255,255,0.08);padding:8px;border-radius:var(--radius-sm);
-  cursor:pointer;font-family:var(--font);font-size:0.75rem;
-  transition:all 0.25s;letter-spacing:0.06em;
-}
-.sidebar-footer .btn-clear:hover{
-  background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.6);
-  border-color:rgba(255,255,255,0.15);
-}
-
-/* Sidebar Toggle */
-.sidebar-toggle{
-  position:fixed;left:var(--sidebar-width);top:24px;z-index:101;
-  width:28px;height:52px;background:var(--sidebar-bg);
-  border:1px solid rgba(255,255,255,0.06);border-left:none;
-  border-radius:0 8px 8px 0;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all 0.4s cubic-bezier(0.4,0,0.2,1);
-}
-.sidebar-toggle span{color:#8b7b6b;font-size:0.7rem;transition:transform 0.4s}
+/* ============ 侧栏 · 左侧数据轨 ============ */
+.sidebar{position:fixed;left:0;top:0;width:var(--sidebar-width);height:100vh;z-index:60;display:flex;flex-direction:column;transition:transform .5s cubic-bezier(.4,0,.2,1);background:var(--bg-2);border-right:1px solid var(--line);padding-top:46px}
+.sidebar-header{padding:26px 22px 20px;border-bottom:1px solid var(--line);flex-shrink:0}
+.sidebar-header h2{color:var(--ink);font-size:1.15rem;font-weight:400;letter-spacing:.1em;text-transform:uppercase;font-family:var(--font-display)}
+.sidebar-header .subtitle{color:var(--ink-3);font-size:.66rem;letter-spacing:.14em;margin-top:8px;font-family:var(--font-mono);text-transform:uppercase}
+.sidebar-locked{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 20px;text-align:center}
+.sidebar-locked p{color:var(--ink-2);font-size:.8rem;line-height:2;letter-spacing:.04em}
+.sidebar-locked .btn-auth{display:inline-block;margin-top:16px;padding:10px 30px;background:var(--neon);color:#000;border:none;border-radius:8px;font-size:.72rem;font-family:var(--font-ui);cursor:pointer;letter-spacing:.14em;text-indent:.14em;transition:all .3s;font-weight:700;text-transform:uppercase}
+.sidebar-locked .btn-auth:hover{box-shadow:0 0 20px rgba(200,245,66,.5);transform:translateY(-1px)}
+.sidebar-user-row{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid var(--line)}
+.sidebar-user-row .user-avatar{width:30px;height:30px;border-radius:6px;background:var(--violet);color:#000;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;flex-shrink:0}
+.sidebar-user-row .user-name{color:var(--ink);font-size:.8rem;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sidebar-user-row .btn-logout-sm{background:none;border:none;color:var(--ink-3);padding:2px 6px;cursor:pointer;font-size:.66rem;font-family:var(--font-mono);letter-spacing:.1em;transition:all .3s;text-transform:uppercase}
+.sidebar-user-row .btn-logout-sm:hover{color:var(--neon)}
+.sidebar-history{flex:1;overflow-y:auto;padding:14px 16px}
+.sidebar-history::-webkit-scrollbar{width:5px}
+.sidebar-history::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:3px}
+.history-item{padding:14px 14px;margin-bottom:8px;border-radius:10px;cursor:pointer;transition:all .3s;position:relative;border:1px solid var(--line);background:var(--bg-3)}
+.history-item:hover{border-color:var(--neon);transform:translateX(2px)}
+.history-item.active{border-color:var(--neon);background:linear-gradient(90deg,rgba(200,245,66,.10),transparent);box-shadow:0 0 16px rgba(200,245,66,.12)}
+.history-item .hi-date{color:var(--ink-dim);font-size:.6rem;margin-bottom:6px;font-family:var(--font-mono);letter-spacing:.08em}
+.history-item .hi-name{color:var(--ink);font-size:.86rem;font-weight:700;letter-spacing:.02em}
+.history-item .hi-summary{color:var(--ink-3);font-size:.7rem;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.history-item .hi-delete{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--ink-dim);cursor:pointer;font-size:.8rem;transition:color .3s;padding:0;line-height:1;opacity:0}
+.history-item:hover .hi-delete{opacity:1}
+.history-item .hi-delete:hover{color:var(--red)}
+.history-empty{text-align:center;color:var(--ink-dim);padding:44px 18px;font-size:.72rem;line-height:2.1;font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase}
+.sidebar-footer{padding:14px 18px;border-top:1px solid var(--line);flex-shrink:0}
+.sidebar-footer .btn-clear{width:100%;background:transparent;color:var(--ink-2);border:1px solid var(--line-2);padding:9px;border-radius:8px;cursor:pointer;font-family:var(--font-ui);font-size:.68rem;transition:all .3s;letter-spacing:.1em;font-weight:700;text-transform:uppercase}
+.sidebar-footer .btn-clear:hover{color:var(--red);border-color:var(--red)}
+.sidebar-toggle{position:fixed;left:var(--sidebar-width);top:54px;z-index:61;width:24px;height:44px;background:var(--bg-2);border:1px solid var(--line);border-left:none;border-radius:0 10px 10px 0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .5s cubic-bezier(.4,0,.2,1)}
+.sidebar-toggle span{color:var(--neon);font-size:.66rem;transition:transform .5s}
 .sidebar.collapsed{transform:translateX(calc(-1 * var(--sidebar-width)))}
 .sidebar.collapsed~.sidebar-toggle{left:0}
 .sidebar.collapsed~.sidebar-toggle span{transform:rotate(180deg)}
 .sidebar.collapsed~.main-content{margin-left:0}
 
-/* ===== Main Content ===== */
-.main-content{
-  margin-left:var(--sidebar-width);transition:margin-left 0.4s cubic-bezier(0.4,0,0.2,1);
-  min-height:100vh;
-}
+/* ============ 主内容 ============ */
+.main-content{margin-left:var(--sidebar-width);transition:margin-left .5s cubic-bezier(.4,0,.2,1);min-height:100vh;position:relative;z-index:5;padding-top:46px;padding-bottom:0}
 
-/* ===== Header ===== */
-.header{
-  padding:48px 40px 36px;text-align:center;
-  border-bottom:1px solid var(--border);
-  position:relative;
-}
-.header-auth{position:absolute;top:16px;right:24px;display:flex;align-items:center;gap:8px;z-index:5}
-.header-auth .btn-auth{padding:6px 16px;border-radius:16px;font-size:0.75rem;font-family:var(--font);cursor:pointer;transition:all 0.2s;background:transparent;color:var(--text-muted);border:1px solid var(--border);letter-spacing:0.04em}
-.header-auth .btn-auth:hover{border-color:var(--accent);color:var(--accent)}
-.header-auth .btn-auth.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-.header-auth .btn-auth.primary:hover{background:var(--accent-hover)}
-.header-auth .user-badge{display:flex;align-items:center;gap:6px;font-size:0.78rem;color:var(--text)}
-.header-auth .user-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
-.header::after{
-  content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);
-  width:60px;height:2px;background:var(--accent);border-radius:1px;
-}
-.header h1{
-  font-size:2.6rem;color:var(--text);letter-spacing:0.35em;font-weight:700;
-  margin-bottom:8px;
-}
-.header .subtitle{
-  color:var(--text-muted);font-size:0.85rem;letter-spacing:0.2em;
-}
-.header .method-badge{
-  display:inline-block;margin-top:18px;padding:6px 20px;
-  border:1px solid var(--border);border-radius:20px;
-  color:var(--text-muted);font-size:0.75rem;letter-spacing:0.08em;
-}
+/* ============ 顶栏 · 大标题 ============ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.header{position:relative;padding:74px 32px 48px;text-align:center;min-height:64vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;animation:fadeUp .7s ease-out both}
+.header-auth{position:absolute;top:26px;right:26px;display:flex;align-items:center;gap:12px;z-index:8}
+.header-auth .btn-auth{background:none;border:1.5px solid var(--line-2);color:var(--ink-2);font-size:.66rem;font-family:var(--font-ui);cursor:pointer;letter-spacing:.06em;padding:7px 16px;border-radius:8px;transition:all .3s;font-weight:700;text-transform:uppercase}
+.header-auth .btn-auth:hover{color:#000;background:var(--ink);border-color:var(--ink)}
+.header-auth .btn-auth.primary{border-color:var(--neon);color:var(--neon)}
+.header-auth .btn-auth.primary:hover{background:var(--neon);color:#000;border-color:var(--neon);box-shadow:0 0 18px rgba(200,245,66,.4)}
+.header-auth .user-badge{display:flex;align-items:center;gap:8px;font-size:.72rem;color:var(--ink);letter-spacing:.06em;font-weight:700;text-transform:uppercase}
+.header-auth .user-badge .dot{width:8px;height:8px;border-radius:2px;background:var(--neon);box-shadow:0 0 10px var(--neon)}
+/* 超大背景字 LIUYAOZHANBU · 以标题为中心叠于其下 */
+.hero-title{position:relative;display:flex;align-items:center;justify-content:center;width:100%}
+.hero-giant{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scaleY(1.4);transform-origin:center;font-family:var(--font-display);font-size:clamp(3rem,13vw,17rem);line-height:.85;letter-spacing:-.01em;text-transform:uppercase;white-space:nowrap;text-align:center;color:rgba(242,243,239,.30);z-index:1;user-select:none;pointer-events:none}
+.hero-display-sub{position:relative;z-index:3;font-family:var(--font-ui);font-weight:900;font-size:clamp(2.2rem,8vw,4.2rem);letter-spacing:.06em;color:var(--neon);text-transform:uppercase;text-shadow:0 0 30px rgba(200,245,66,.5);transform:translateX(3px)}
+.header .subtitle{position:relative;z-index:3;color:var(--ink-3);font-size:.74rem;font-family:var(--font-mono);letter-spacing:.14em;text-transform:uppercase;margin-top:16px}
+.header .method-badge{position:relative;z-index:3;display:inline-block;margin-top:20px;color:#000;font-size:.68rem;letter-spacing:.1em;background:var(--neon);border-radius:8px;padding:8px 20px;font-weight:800;text-transform:uppercase;box-shadow:0 0 20px rgba(200,245,66,.35)}
+.header .hero-tags{position:relative;z-index:3;display:flex;justify-content:center;gap:10px;margin-top:22px;flex-wrap:wrap}
+.header .hero-tags span{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.1em;color:var(--ink-2);border:1px solid var(--line-2);border-radius:20px;padding:5px 14px;text-transform:uppercase}
+.header .hero-tags span:nth-child(2){color:var(--violet);border-color:var(--violet)}
+.header .hero-tags span:nth-child(3){color:var(--cyan);border-color:var(--cyan)}
 
-/* ===== Method Section ===== */
-.method-section{
-  max-width:760px;margin:28px auto;padding:28px 32px;
-  background:var(--bg-card);border:1px solid var(--border);
-  border-radius:var(--radius);box-shadow:var(--shadow-sm);
-}
-.method-section h3{
-  color:var(--text);font-size:1.05rem;margin-bottom:18px;
-  text-align:center;font-weight:600;letter-spacing:0.08em;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-}
-.method-section h3::before,.method-section h3::after{
-  content:'';display:inline-block;width:24px;height:1px;background:var(--border);
-}
-.method-steps{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
-.method-step{
-  flex:1;min-width:120px;max-width:155px;text-align:center;
-  padding:18px 12px;background:var(--bg);border-radius:var(--radius-sm);
-  transition:transform 0.2s,box-shadow 0.2s;
-}
-.method-step:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
-.method-step .step-num{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:28px;height:28px;background:var(--accent);color:#fff;
-  border-radius:50%;font-size:0.75rem;margin-bottom:10px;
-}
-.method-step .step-title{font-weight:600;font-size:0.88rem;margin-bottom:4px;color:var(--text)}
-.method-step .step-desc{font-size:0.72rem;color:var(--text-muted);line-height:1.6}
+/* ============ 线性叙事进度 ============ */
+.flow-progress{position:relative;max-width:560px;margin:20px auto 8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;animation:fadeUp .7s .08s ease-out both;border:1px solid var(--line);border-radius:12px;background:var(--bg-3)}
+.flow-progress::before{content:'';position:absolute;left:56px;right:56px;top:50%;height:2px;background:linear-gradient(90deg,var(--neon),var(--line))}
+.fp-node{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:8px;width:50px}
+.fp-dot{width:14px;height:14px;border-radius:4px;background:var(--bg-3);border:2px solid var(--line-2);transition:all .55s}
+.fp-node.active .fp-dot{background:var(--ink);border-color:var(--ink)}
+.fp-node.current .fp-dot{background:var(--neon);border-color:var(--neon);box-shadow:0 0 0 6px rgba(200,245,66,.16);animation:breathe 2.8s ease-in-out infinite}
+.fp-label{font-size:.62rem;font-weight:700;letter-spacing:.08em;color:var(--ink-3);transition:color .55s;text-transform:uppercase;font-family:var(--font-mono)}
+.fp-node.active .fp-label{color:var(--ink)}
+.fp-node.current .fp-label{color:var(--neon)}
+@keyframes breathe{0%,100%{box-shadow:0 0 0 6px rgba(200,245,66,.16)}50%{box-shadow:0 0 0 12px rgba(200,245,66,.06)}}
 
-.rules-note{
-  margin-top:16px;padding:12px 16px;background:var(--bg);
-  border-radius:var(--radius-sm);font-size:0.8rem;
-  color:var(--text-muted);text-align:center;line-height:1.8;
-  border:1px solid var(--border);
-}
+/* ============ 占卜之法 ============ */
+.method-section{max-width:600px;margin:14px auto 26px;padding:0 20px 20px;text-align:center;animation:fadeUp .7s .12s ease-out both;border-bottom:1px solid var(--line)}
+.method-section h3{font-family:var(--font-display);color:var(--ink);font-size:1.4rem;font-weight:400;letter-spacing:.04em;margin-bottom:16px;text-transform:uppercase}
+.method-section h3 em{color:var(--neon);font-style:normal}
+.method-lede{color:var(--ink-2);font-size:.86rem;font-weight:500;letter-spacing:.04em;line-height:2.2}
+.rules-note{margin-top:22px;font-size:.76rem;color:var(--ink-3);text-align:center}
+.rules-note summary{cursor:pointer;letter-spacing:.08em;color:var(--neon);list-style:none;outline:none;transition:color .3s;font-weight:800;font-size:.8rem;text-transform:uppercase;font-family:var(--font-mono)}
+.rules-note summary::-webkit-details-marker{display:none}
+.rules-note summary::before{content:'▸ ';color:var(--neon)}
+.rules-note summary:hover{color:var(--ink)}
+.rules-note p{margin-top:14px;line-height:1.95;letter-spacing:.02em;color:var(--ink-2);background:var(--bg-3);border:1px solid var(--line);border-radius:12px;padding:20px 22px;text-align:left}
+.rules-note p strong{color:var(--neon);font-weight:700}
 
-/* ===== Coin Toss Area ===== */
-.toss-area{max-width:760px;margin:32px auto;text-align:center;padding:0 20px}
-.toss-progress{display:flex;justify-content:center;gap:16px;margin-bottom:28px}
-.toss-dot{
-  width:42px;height:42px;border-radius:50%;
-  border:2px solid var(--border);display:flex;align-items:center;justify-content:center;
-  font-size:0.78rem;color:var(--text-muted);background:var(--bg-card);
-  transition:all 0.35s;font-weight:500;position:relative;
-}
-.toss-dot.completed{
-  background:var(--text);border-color:var(--text);color:#fff;
-}
-.toss-dot.current{
-  animation:pulse 1.4s infinite;border-color:var(--accent);
-  box-shadow:0 0 0 4px rgba(153,51,51,0.08);
-}
-.toss-dot.changing::after{
-  content:'';position:absolute;top:-5px;right:-5px;
-  width:10px;height:10px;background:var(--accent);
-  border-radius:50%;border:2px solid var(--bg-card);
-}
-@keyframes pulse{
-  0%,100%{box-shadow:0 0 0 4px rgba(153,51,51,0.08)}
-  50%{box-shadow:0 0 0 10px rgba(153,51,51,0.04)}
-}
+/* ============ 掷钱区 ============ */
+.toss-area{max-width:720px;margin:26px auto;text-align:center;padding:0 20px;position:relative;animation:fadeUp .7s .16s ease-out both}
+.toss-progress{display:flex;justify-content:center;gap:clamp(8px,2.4vw,22px);margin-bottom:24px}
+.toss-dot{width:44px;height:44px;border-radius:8px;border:1.5px solid var(--line-2);display:flex;align-items:center;justify-content:center;font-size:.78rem;color:var(--ink-2);background:var(--bg-3);transition:all .45s;font-weight:800;position:relative;font-family:var(--font-ui)}
+.toss-dot.completed{background:var(--neon);border-color:var(--neon);color:#000;box-shadow:0 0 14px rgba(200,245,66,.4)}
+.toss-dot.current{animation:pulse 1.8s infinite;border-color:var(--violet);color:var(--violet)}
+.toss-dot.changing::after{content:'';position:absolute;top:-3px;right:-3px;width:11px;height:11px;background:var(--red);border-radius:3px;border:2px solid var(--bg);animation:breathe 2.4s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 5px rgba(155,107,255,.18)}50%{box-shadow:0 0 0 12px rgba(155,107,255,.08)}}
 
-.coin-display{
-  width:110px;height:110px;margin:0 auto 24px;
-  perspective:600px;cursor:pointer;position:relative;
-}
-.coin{
-  width:100%;height:100%;position:relative;
-  transform-style:preserve-3d;transition:transform 0.5s;
-}
-.coin.flipping{animation:flipCoin 0.8s ease-out}
+.divination-mat{position:relative;margin:4px auto 28px;padding:40px 20px 30px;max-width:560px;border-radius:16px;background:var(--bg-3);border:1px solid var(--line);box-shadow:0 0 0 1px rgba(200,245,66,.10),0 20px 60px rgba(0,0,0,.5)}
+.divination-mat::after{content:'';position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);width:64%;height:14px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.5),transparent 70%);filter:blur(4px)}
+.coin-display{perspective:1100px;position:relative;z-index:2}
+.coins{display:flex;gap:clamp(24px,4.6vw,42px);align-items:center;justify-content:center;transform-style:preserve-3d}
+.coin{width:clamp(78px,14vw,100px);height:clamp(78px,14vw,100px);position:relative;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.4,0,.2,1);cursor:pointer}
+.coin.flipping{animation:flipCoin .8s ease-out}
 .coin.result-yang{animation:none;transform:rotateY(0deg)}
 .coin.result-yin{animation:none;transform:rotateY(180deg)}
-.coin .face{
-  position:absolute;width:100%;height:100%;backface-visibility:hidden;
-  border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  font-size:2.4rem;box-shadow:0 4px 20px rgba(0,0,0,0.12),inset 0 1px 0 rgba(255,255,255,0.4);
-  gap:2px;line-height:1;
-}
-.coin .face .face-label{font-size:0.65rem;opacity:0.7;letter-spacing:0.1em}
-.coin .heads{
-  background:linear-gradient(135deg,#f0d68a 0%,#d4b85a 40%,#b89340 100%);
-  z-index:2;color:#5c3800;
-}
-.coin .tails{
-  background:linear-gradient(135deg,#6b5030 0%,#4a3520 50%,#3a2818 100%);
-  transform:rotateY(180deg);color:#c8b898;
-}
-@keyframes flipCoin{
-  0%{transform:rotateY(0) rotateX(0)}
-  25%{transform:rotateY(540deg) rotateX(25deg)}
-  50%{transform:rotateY(1080deg) rotateX(-15deg)}
-  75%{transform:rotateY(1620deg) rotateX(8deg)}
-  100%{transform:rotateY(2160deg) rotateX(0)}
-}
+.coin .face{position:absolute;inset:0;border-radius:50%;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 36% 28%,#2a2d33 0%,#17191d 58%,#0e0f12 100%);border:2px solid rgba(244,246,240,.30)}
+.coin .face::before{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:22%;height:22%;background:rgba(0,0,0,.35);border:1.5px solid rgba(244,246,240,.40)}
+.coin .heads{color:var(--neon);z-index:2}
+.coin .tails{transform:rotateY(180deg);color:var(--violet)}
+.coin-mark{position:absolute;top:13%;left:0;right:0;text-align:center;font-size:clamp(1rem,3vw,1.4rem);line-height:1;font-family:var(--font-ui);z-index:2}
+.coin-label{position:absolute;bottom:12%;left:0;right:0;text-align:center;font-size:.72rem;letter-spacing:.12em;text-indent:.12em;opacity:.9;font-weight:800;z-index:2;text-transform:uppercase;font-family:var(--font-mono)}
+@keyframes flipCoin{0%{transform:rotateY(0) rotateX(0)}25%{transform:rotateY(540deg) rotateX(25deg)}50%{transform:rotateY(1080deg) rotateX(-15deg)}75%{transform:rotateY(1620deg) rotateX(8deg)}100%{transform:rotateY(2160deg) rotateX(0)}}
 
-.btn-toss{
-  display:inline-flex;align-items:center;justify-content:center;
-  padding:13px 44px;gap:8px;
-  background:var(--accent);color:#fff;border:none;border-radius:24px;
-  font-family:var(--font);font-size:1rem;letter-spacing:0.1em;font-weight:500;
-  cursor:pointer;transition:all 0.25s;
-  box-shadow:0 2px 12px rgba(153,51,51,0.2);
-  position:relative;overflow:hidden;line-height:1.4;
-}
-.btn-toss:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 20px rgba(153,51,51,0.3)}
+.btn-toss{display:inline-flex;align-items:center;justify-content:center;padding:15px 46px;background:var(--neon);color:#000;border:1px solid var(--neon);border-radius:10px;font-family:var(--font-ui);font-size:.86rem;letter-spacing:.14em;text-indent:.14em;font-weight:800;cursor:pointer;transition:all .3s;line-height:1.3;position:relative;overflow:hidden;text-transform:uppercase;box-shadow:0 0 22px rgba(200,245,66,.3)}
+.btn-toss:hover{transform:translateY(-2px);box-shadow:0 0 34px rgba(200,245,66,.55)}
 .btn-toss:active{transform:translateY(0)}
-.btn-toss:disabled{background:#bbb;box-shadow:none;cursor:not-allowed;transform:none}
-.btn-toss::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(255,255,255,0.08),transparent 50%);
-  pointer-events:none;border-radius:24px;
-}
-.btn-reset{
-  background:var(--jade);box-shadow:0 2px 12px rgba(90,122,106,0.2);
-}
-.btn-reset:hover{background:#4d6d5d;box-shadow:0 4px 20px rgba(90,122,106,0.3)}
+.btn-toss:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-reset{background:transparent;color:var(--violet);border-color:var(--violet);box-shadow:none;font-weight:800}
+.btn-reset:hover{background:var(--violet);color:#000;box-shadow:0 0 30px rgba(155,107,255,.5)}
+.toss-status{margin-top:18px;color:var(--ink-3);font-size:.78rem;min-height:20px;letter-spacing:.04em;font-weight:600;font-family:var(--font-mono)}
 
-.toss-status{margin-top:14px;color:var(--text-muted);font-size:0.85rem;min-height:22px}
+.current-toss-result{display:flex;align-items:center;justify-content:center;margin:8px 0 2px;min-height:54px}
+.toss-line-result{display:flex;flex-direction:column;align-items:center;gap:4px;opacity:0;transform:translateY(6px);transition:all .5s cubic-bezier(.175,.885,.32,1.275)}
+.toss-line-result.show{opacity:1;transform:translateY(0)}
+.toss-line-result .tlg{font-size:2rem;line-height:1.2;color:var(--neon);font-family:var(--font-ui)}
+.toss-line-result .tln{font-size:.72rem;color:var(--ink-3);letter-spacing:.12em;text-indent:.12em;font-weight:700;font-family:var(--font-mono);text-transform:uppercase}
 
-/* Current Toss Result */
-.current-toss-result{
-  display:flex;align-items:center;justify-content:center;gap:16px;
-  margin:12px 0;min-height:52px;
-}
-.coins-result{display:flex;gap:10px}
-.coin-mini{
-  width:34px;height:34px;border-radius:50%;display:flex;
-  align-items:center;justify-content:center;font-size:1rem;
-  opacity:0;transform:scale(0);transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
-}
-.coin-mini.show{opacity:1;transform:scale(1)}
-.coin-mini.heads{background:#c8a45a;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.12)}
-.coin-mini.tails{background:#6b5230;color:#ddd;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
-
-/* ===== Result Section ===== */
-.result-section{max-width:760px;margin:0 auto 40px;padding:0 20px;display:none}
-.result-section.visible{display:block}
-
-/* Hexagram Display */
-.hexagram-display{text-align:center;margin-bottom:32px}
-.hex-title{font-size:2.2rem;color:var(--text);letter-spacing:0.25em;font-weight:700;margin-bottom:4px}
-.hex-subtitle{color:var(--text-muted);font-size:0.8rem;margin-bottom:24px;letter-spacing:0.06em}
-.hex-lines{display:flex;flex-direction:column;align-items:center;gap:5px;margin-bottom:16px}
-.hex-line{display:flex;align-items:center;gap:14px;opacity:0;transform:translateY(10px);transition:all 0.4s ease-out}
+/* ============ 结果区 ============ */
+.result-section{max-width:720px;margin:0 auto 40px;padding:0 20px;display:none}
+.result-section.visible{display:block;animation:fadeUp .7s ease-out both}
+.hexagram-display{text-align:center;margin-bottom:26px;padding:42px 26px 36px;border-radius:16px;background:var(--bg-3);border:1px solid var(--line);box-shadow:0 0 0 1px rgba(200,245,66,.10)}
+.hex-title{font-size:clamp(2.2rem,6vw,3.4rem);letter-spacing:.02em;font-weight:400;margin-bottom:8px;font-family:var(--font-display);color:var(--ink);text-transform:uppercase}
+.hex-subtitle{color:var(--ink-3);font-size:.7rem;margin-bottom:28px;letter-spacing:.1em;font-family:var(--font-mono);text-transform:uppercase}
+.hex-lines{display:flex;flex-direction:column;align-items:center;gap:11px;margin-bottom:28px}
+.hex-line{display:flex;align-items:center;gap:16px;opacity:0;transform:translateY(12px);transition:all .5s ease-out}
 .hex-line.visible{opacity:1;transform:translateY(0)}
-.hex-line .line-label{font-size:0.7rem;color:var(--text-muted);width:40px;text-align:right}
-.hex-line .line-bar{height:7px;border-radius:4px;transition:all 0.4s}
-.hex-line .line-bar.yang{width:130px;background:var(--text)}
-.hex-line .line-bar.yin{display:flex;gap:5px}
-.hex-line .line-bar.yin .yin-half{width:62px;height:7px;background:var(--text);border-radius:4px}
-.hex-line .line-change-indicator{font-size:0.7rem;color:var(--accent);width:36px;font-weight:500}
+.hex-line .line-label{font-size:.68rem;color:var(--ink-3);width:42px;text-align:right;letter-spacing:.06em;font-weight:700;font-family:var(--font-mono)}
+.hex-line .line-bar{height:11px;border-radius:3px;transition:all .5s;background:var(--neon);box-shadow:0 0 12px rgba(200,245,66,.4)}
+.hex-line .line-bar.yang{width:150px}
+.hex-line .line-bar.yin{display:flex;gap:11px;background:transparent;box-shadow:none}
+.hex-line .line-bar.yin .yin-half{width:70px;height:11px;background:var(--ink-2);border-radius:3px}
+.hex-line .line-change-indicator{font-size:.7rem;color:var(--pink);width:44px;font-weight:800;letter-spacing:.04em;font-family:var(--font-mono);text-transform:uppercase}
+.interp-card{background:var(--bg-3);border:1px solid var(--line);border-radius:14px;padding:24px 26px;margin-bottom:14px;transition:border-color .3s,transform .3s,box-shadow .3s}
+.interp-card:hover{border-color:var(--neon);transform:translateY(-2px);box-shadow:0 0 24px rgba(200,245,66,.10)}
+.interp-card h4{color:var(--ink);font-size:.86rem;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--line);font-weight:800;letter-spacing:.1em;font-family:var(--font-mono);text-align:left;text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.interp-card h4::before{content:'/';color:var(--neon);font-weight:800}
+.interp-card .label{display:inline-block;padding:2px 10px;background:var(--neon-soft);border-radius:5px;font-size:.66rem;color:var(--neon);margin-right:8px;margin-bottom:3px;border:1px solid rgba(200,245,66,.3);letter-spacing:.06em;font-weight:800;font-family:var(--font-mono);text-transform:uppercase}
+.interp-card p{font-size:.88rem;line-height:1.9;color:var(--ink-2)}
+.interp-card .changing-note{margin-top:10px;padding:14px 16px;background:rgba(244,83,157,.10);border-left:3px solid var(--pink);border-radius:0 8px 8px 0;font-size:.82rem;color:var(--ink-2);line-height:1.9;font-weight:500}
+.interp-card .changing-note strong{color:var(--pink);font-weight:800}
+.changed-hex{margin-top:24px;padding:24px 26px;border:1px solid rgba(155,107,255,.4);background:rgba(155,107,255,.08);border-radius:14px}
+.changed-hex h4{color:var(--violet)}
+.changed-hex h4::before{color:var(--violet)}
+.changed-hex .label{background:rgba(155,107,255,.16);color:var(--violet);border-color:rgba(155,107,255,.4)}
 
-/* Interpretation Cards */
-.interp-card{
-  background:var(--bg-card);border:1px solid var(--border);
-  border-radius:var(--radius);padding:24px 28px;margin-bottom:14px;
-  box-shadow:var(--shadow-sm);transition:box-shadow 0.2s;
-}
-.interp-card:hover{box-shadow:var(--shadow-md)}
-.interp-card h4{
-  color:var(--text);font-size:1rem;margin-bottom:14px;padding-bottom:10px;
-  border-bottom:1px solid var(--border);font-weight:600;letter-spacing:0.06em;
-}
-.interp-card .label{
-  display:inline-block;padding:2px 10px;background:var(--bg);
-  border-radius:4px;font-size:0.7rem;color:var(--text-muted);
-  margin-right:6px;margin-bottom:3px;border:1px solid var(--border);
-}
-.interp-card p{font-size:0.88rem;line-height:1.95;color:var(--text)}
-.interp-card .changing-note{
-  margin-top:10px;padding:10px 16px;background:rgba(153,51,51,0.03);
-  border-left:2px solid var(--accent);border-radius:0 6px 6px 0;
-  font-size:0.8rem;color:var(--accent);line-height:1.8;
-}
+/* ============ 空态 ============ */
+.empty-state{text-align:center;padding:66px 20px;animation:fadeUp .7s .2s ease-out both}
+.empty-state .bagua-icon{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:460px;margin:0 auto 26px;padding:0 4px;font-size:1.15rem;line-height:1;opacity:.5;color:var(--neon)}
+.empty-state p{font-size:.86rem;line-height:2.3;color:var(--ink-2);letter-spacing:.04em;font-weight:500}
 
-.changed-hex{margin-top:28px;padding-top:20px;border-top:1px solid var(--border)}
-.changed-hex h4{color:var(--jade)}
+/* ============ 页脚 ============ */
+.footer{text-align:center;padding:36px 20px;color:var(--ink-3);background:var(--bg-2);border-top:1px solid var(--line);font-size:.68rem;letter-spacing:.08em;line-height:2.2;font-family:var(--font-mono);text-transform:uppercase}
+.footer b{color:var(--neon);font-weight:800}
 
-/* ===== Toast ===== */
-.toast{
-  position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-120px);
-  background:var(--text);color:#fff;padding:10px 24px;
-  border-radius:20px;font-size:0.8rem;z-index:200;
-  transition:transform 0.35s cubic-bezier(0.175,0.885,0.32,1.275);
-  letter-spacing:0.04em;box-shadow:var(--shadow-lg);
-}
+/* ============ Toast ============ */
+.toast{position:fixed;top:62px;left:50%;transform:translateX(-50%) translateY(-140px);background:var(--neon);color:#000;padding:12px 28px;border-radius:10px;font-size:.78rem;z-index:400;transition:transform .35s cubic-bezier(.175,.885,.32,1.275);letter-spacing:.06em;font-weight:800;box-shadow:0 0 30px rgba(200,245,66,.4);text-transform:uppercase}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
-/* ===== Modal ===== */
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(2px);
-  z-index:150;display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;transition:opacity 0.25s;
-}
+/* ============ 弹窗 ============ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);z-index:350;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
 .modal-overlay.show{opacity:1;pointer-events:auto}
-.modal{
-  background:var(--bg-card);border-radius:var(--radius-lg);padding:32px;
-  max-width:420px;width:90%;box-shadow:var(--shadow-lg);
-  border:1px solid var(--border);
-}
-.modal h3{font-size:1rem;color:var(--text);margin-bottom:12px;font-weight:600}
-.modal p{font-size:0.85rem;line-height:1.85;margin-bottom:20px;color:var(--text-muted)}
+.modal{background:var(--bg-3);border-radius:16px;padding:38px;max-width:420px;width:90%;border:1px solid var(--line);box-shadow:0 26px 70px rgba(0,0,0,.6)}
+.modal h3{font-size:1rem;color:var(--ink);margin-bottom:14px;font-weight:800;letter-spacing:.08em;font-family:var(--font-mono);text-transform:uppercase}
+.modal p{font-size:.82rem;line-height:1.9;margin-bottom:24px;color:var(--ink-2)}
 .modal-btns{display:flex;gap:10px;justify-content:flex-end}
-.modal-btns button{
-  padding:8px 22px;border-radius:20px;border:1px solid var(--border);
-  cursor:pointer;font-family:var(--font);font-size:0.82rem;
-  transition:all 0.2s;background:var(--bg);color:var(--text);
-}
-.modal-btns .btn-confirm{background:var(--accent);color:#fff;border-color:var(--accent)}
+.modal-btns button{padding:10px 26px;border-radius:8px;border:1px solid var(--line-2);cursor:pointer;font-family:var(--font-ui);font-size:.72rem;transition:all .3s;background:transparent;color:var(--ink-2);letter-spacing:.08em;font-weight:700;text-transform:uppercase}
+.modal-btns button:hover{color:#000;background:var(--ink);border-color:var(--ink)}
+.modal-btns .btn-confirm{background:var(--red);color:#000;border-color:var(--red)}
+.modal-btns .btn-confirm:hover{box-shadow:0 0 24px rgba(255,61,61,.5)}
+.auth-tabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:26px}
+.auth-tab{flex:1;text-align:center;padding:12px;cursor:pointer;font-size:.78rem;color:var(--ink-3);transition:all .3s;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;background:none;font-family:var(--font-ui);letter-spacing:.08em;font-weight:800;text-transform:uppercase}
+.auth-tab.active{color:var(--neon);border-bottom-color:var(--neon)}
+.auth-form{display:none;flex-direction:column;gap:12px}
+.auth-form.active{display:flex}
+.auth-form input{width:100%;padding:14px 16px;border:1px solid var(--line-2);border-radius:9px;font-size:.84rem;font-family:var(--font-ui);background:var(--bg-2);color:var(--ink);outline:none;transition:border-color .3s,box-shadow .3s}
+.auth-form input:focus{border-color:var(--neon);box-shadow:0 0 0 3px rgba(200,245,66,.16)}
+.auth-form input::placeholder{color:var(--ink-3)}
+.auth-form .btn-submit{width:100%;padding:13px;background:var(--neon);color:#000;border:none;border-radius:9px;font-size:.8rem;font-family:var(--font-ui);cursor:pointer;letter-spacing:.1em;font-weight:800;transition:all .3s;text-transform:uppercase}
+.auth-form .btn-submit:hover{box-shadow:0 0 26px rgba(200,245,66,.5)}
+.auth-form .auth-error{color:var(--pink);font-size:.72rem;text-align:center;min-height:18px;font-weight:700}
 
-/* ===== Empty State ===== */
-.empty-state{text-align:center;padding:80px 20px}
-.empty-state .bagua-icon{font-size:2.5rem;margin-bottom:20px;opacity:0.3;letter-spacing:4px}
-.empty-state p{font-size:0.9rem;line-height:2.2;color:var(--text-muted)}
+/* ============ 涟漪 ============ */
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.5);transform:scale(0);animation:rippleEffect .5s linear;pointer-events:none}
+@keyframes rippleEffect{to{transform:scale(4);opacity:0}}
 
-/* ===== Footer ===== */
-.footer{text-align:center;padding:32px;color:var(--text-muted);font-size:0.72rem;opacity:0.5}
-
-/* ===== Responsive ===== */
+/* ============ 响应式 ============ */
 @media(max-width:768px){
+  :root{--sidebar-width:250px}
   .sidebar{transform:translateX(calc(-1*var(--sidebar-width)))}
   .sidebar.open-mobile{transform:translateX(0)}
   .sidebar-toggle{left:0}
   .sidebar.open-mobile~.sidebar-toggle{left:var(--sidebar-width)}
   .sidebar.open-mobile~.sidebar-toggle span{transform:rotate(180deg)}
   .main-content{margin-left:0}
-  .header{padding:28px 16px 24px}
-  .header h1{font-size:1.6rem;letter-spacing:0.18em}
-  .header .subtitle{font-size:0.72rem}
-  .header .method-badge{font-size:0.68rem;padding:5px 14px;margin-top:12px}
-  .header-auth{top:10px;right:12px;gap:4px}
-  .header-auth .btn-auth{padding:4px 10px;font-size:0.68rem}
-  .method-section{padding:16px;margin:16px 12px}
-  .method-section h3{font-size:0.9rem;margin-bottom:12px}
-  .method-section h3::before,.method-section h3::after{width:16px}
-  .method-steps{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .method-step{padding:10px 8px;max-width:none}
-  .method-step .step-num{width:22px;height:22px;font-size:0.65rem;margin-bottom:6px}
-  .method-step .step-title{font-size:0.76rem}
-  .method-step .step-desc{font-size:0.65rem;line-height:1.4}
-  .toss-area{margin:20px auto}
-  .toss-dot{width:34px;height:34px;font-size:0.65rem}
+  .topbar .tb-meta{display:none}
+  .header{padding:56px 14px 34px}
+  .hero-giant{font-size:clamp(2.8rem,15vw,7rem)}
+  .hero-display-sub{font-size:clamp(1.7rem,7vw,2.6rem)}
+  .header-auth{top:16px;right:14px;gap:8px}
+  .header-auth .btn-auth{font-size:.6rem;padding:6px 12px}
+  .toss-dot{width:38px;height:38px;font-size:.7rem}
   .toss-progress{gap:6px}
-  .coin-display{width:90px;height:90px;margin-bottom:16px}
-  .coin .face{font-size:1.8rem}
-  .coin .face .face-label{font-size:0.55rem}
-  .btn-toss{padding:11px 32px;font-size:0.9rem}
-  .interp-card{padding:16px}
-  .interp-card h4{font-size:0.9rem}
-  .interp-card p{font-size:0.8rem}
-  .hex-title{font-size:1.6rem}
-  .result-section{padding:0 12px}
-  .rules-note{font-size:0.7rem;padding:10px 12px;line-height:1.6}
+  .flow-progress{margin:20px auto 8px;padding:10px 12px}
+  .divination-mat{padding:30px 18px 26px}
+  .btn-toss{padding:13px 34px;font-size:.78rem}
+  .interp-card{padding:22px 22px}
+  .interp-card h4{font-size:.78rem}
+  .hexagram-display{padding:30px 22px 26px}
+  .result-section{padding:0 22px}
+  .method-section{padding:0 22px 20px}
+  .toss-area{padding:0 22px}
+  .empty-state{padding:56px 22px}
+  .rules-note p{padding:22px 22px}
+  .coin .face{border-width:1px}
+  .coin .face::before{border-width:1px}
+  .coin-mark{top:8%}
+  .coin-label{bottom:8%}
 }
 @media(max-width:400px){
-  .method-steps{grid-template-columns:1fr;gap:6px}
-  .method-step{display:flex;align-items:center;gap:10px;padding:8px 12px;text-align:left}
-  .method-step .step-num{flex-shrink:0;margin-bottom:0}
-  .method-step .step-desc{display:none}
-  .header h1{font-size:1.4rem}
-  .header{padding:22px 12px 18px}
-  .header-auth{top:6px;right:8px;gap:3px}
-  .header-auth .btn-auth{padding:3px 8px;font-size:0.62rem}
-  .toss-dot{width:30px;height:30px;font-size:0.6rem}
-  .toss-progress{gap:4px}
-  .rules-note{font-size:0.62rem;padding:8px 10px}
-  .rules-note br{display:none}
-  .rules-note em{display:inline}
+  .hero-giant{font-size:clamp(2.6rem,15vw,7rem)}
+  .toss-dot{width:32px;height:32px;font-size:.64rem}
+  .coin{width:64px;height:64px}
 }
 
-/* ===== Ripple ===== */
-.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,0.25);transform:scale(0);animation:rippleEffect 0.5s linear;pointer-events:none}
-@keyframes rippleEffect{to{transform:scale(4);opacity:0}}
-</style></head>
+/* ============ 无障碍 / 动效偏好 ============ */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
 <body>
 
-<!-- Sidebar -->
+<div class="topbar">
+  <div class="tb-brand"><span class="dot"></span>LIU&nbsp;YAO</div>
+  <div class="tb-meta"><b>64 HEXAGRAMS</b> / 3 COINS / <b>SYS.ONLINE</b></div>
+</div>
+
+<!-- 场景层 · 留白 -->
+<div class="scene" aria-hidden="true">
+  <svg class="scene-mountains" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
+    <defs>
+      <linearGradient id="mtFar" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#a9bab6" stop-opacity="0.62"/>
+        <stop offset="0.7" stop-color="#c2ceca" stop-opacity="0.14"/>
+        <stop offset="1" stop-color="#ccd5d1" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="mtMid" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#8ba29e" stop-opacity="0.7"/>
+        <stop offset="0.75" stop-color="#a9bbb7" stop-opacity="0.1"/>
+        <stop offset="1" stop-color="#b5c4c0" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="softBlur" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="6"/></filter>
+      <filter id="softBlur2" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="16"/></filter>
+    </defs>
+    <g filter="url(#softBlur2)">
+      <path d="M0 470 L170 300 L290 415 L460 250 L630 420 L810 310 L1010 450 L1170 340 L1330 460 L1440 390 L1440 900 L0 900 Z" fill="url(#mtFar)"/>
+    </g>
+    <g filter="url(#softBlur)">
+      <path d="M0 560 C160 430 300 520 460 470 C600 430 720 330 900 430 C1050 515 1200 470 1320 500 C1380 515 1420 520 1440 520 L1440 900 L0 900 Z" fill="url(#mtMid)"/>
+    </g>
+  </svg>
+  <div class="scene-mist mist-1"></div>
+  <div class="scene-light-warm"></div>
+  <div class="scene-grain"></div>
+  <div class="scene-vignette"></div>
+</div>
+
+<!-- 侧栏 · 卦象记录 -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <h2>占 卜 记 录</h2>
-    <div class="subtitle">— 周易六十四卦 —</div>
+    <h2>卦象记录</h2>
+    <div class="subtitle">周易六十四卦</div>
   </div>
-  <!-- logged-in user row -->
   <div class="sidebar-user-row" id="sidebarUserRow" style="display:none">
     <div class="user-avatar" id="sidebarAvatar"></div>
     <div class="user-name" id="sidebarUserName"></div>
     <button class="btn-logout-sm" onclick="logout()">退出</button>
   </div>
-  <!-- history or locked -->
   <div class="sidebar-history" id="historyList"></div>
   <div class="sidebar-locked" id="sidebarLocked">
-    <p>登录后可查看<br>占卜记录</p>
+    <p>登录后可查看卦象记录</p>
     <button class="btn-auth" onclick="showAuthModal('login')">登 录</button>
   </div>
   <div class="sidebar-footer" id="sidebarFooter" style="display:none">
@@ -472,54 +368,41 @@ body{
   <span>◀</span>
 </button>
 
-<!-- Main Content -->
+<!-- 主内容 -->
 <div class="main-content" id="mainContent">
 
-<!-- Header -->
 <header class="header">
   <div class="header-auth" id="headerAuth">
     <button class="btn-auth" onclick="showAuthModal('login')">登录</button>
     <button class="btn-auth primary" onclick="showAuthModal('register')">注册</button>
   </div>
-  <h1>六 爻 占 卜</h1>
-  <div class="subtitle">— 周易六十四卦 · 金钱课法 —</div>
-  <div class="method-badge">三枚铜钱 · 抛掷六次 · 自下而上成卦</div>
+  <div class="hero-title">
+    <div class="hero-giant" aria-hidden="true">LIUYAOZHANBU</div>
+    <h1 class="hero-display-sub">六爻占卜</h1>
+  </div>
+  <div class="subtitle">THE BOOK OF CHANGES · 周易六十四卦</div>
+  <div class="method-badge">3 Coins · 6 Tosses · Hexagram</div>
+  <div class="hero-tags"><span>64 Hexagrams</span><span>Yin / Yang</span><span>Divination</span></div>
 </header>
 
-<!-- Method Explanation -->
+<nav class="flow-progress" id="flowProgress">
+  <div class="fp-node"><span class="fp-dot"></span><span class="fp-label">静心</span></div>
+  <div class="fp-node"><span class="fp-dot"></span><span class="fp-label">摇钱</span></div>
+  <div class="fp-node"><span class="fp-dot"></span><span class="fp-label">成卦</span></div>
+  <div class="fp-node"><span class="fp-dot"></span><span class="fp-label">解卦</span></div>
+</nav>
+
 <section class="method-section">
   <h3>占 卜 之 法</h3>
-  <div class="method-steps">
-    <div class="method-step">
-      <div class="step-num">1</div>
-      <div class="step-title">静心凝神</div>
-      <div class="step-desc">心中默念所问之事，排除杂念，诚意正心</div>
-    </div>
-    <div class="method-step">
-      <div class="step-num">2</div>
-      <div class="step-title">摇钱起卦</div>
-      <div class="step-desc">取三枚铜钱，合于掌中，摇动后抛掷</div>
-    </div>
-    <div class="method-step">
-      <div class="step-num">3</div>
-      <div class="step-title">六次成卦</div>
-      <div class="step-desc">共抛六次，自下而上，逐爻记录，即成卦象</div>
-    </div>
-    <div class="method-step">
-      <div class="step-num">4</div>
-      <div class="step-title">观象玩辞</div>
-      <div class="step-desc">观卦象之变，读彖辞爻辞，以明吉凶悔吝</div>
-    </div>
-  </div>
-  <div class="rules-note">
-    <strong>爻象判定：</strong>
-    三枚铜钱，有字一面为<em>阴</em>（⚋ 值2），无字一面为<em>阳</em>（⚊ 值3）<br>
-    三面皆阳 = 9 老阳 ○（变爻）&emsp;两阳一阴 = 8 少阴 ⚋（不变）<br>
-    三面皆阴 = 6 老阴 ×（变爻）&emsp;两阴一阳 = 7 少阳 ⚊（不变）
-  </div>
+  <p class="method-lede">静心凝神，默念所问 · 三枚铜钱，合掌摇掷 · 六次成卦，自下而上 · 观象玩辞，以明吉凶</p>
+  <details class="rules-note">
+    <summary>爻象判定</summary>
+    <p>三枚铜钱，有字一面为<strong>阴</strong>（⚋ 值2），无字一面为<strong>阳</strong>（⚊ 值3）<br>
+       三面皆阳 = 9 老阳 ○（变爻）&emsp;两阳一阴 = 8 少阴 ⚋（不变）<br>
+       三面皆阴 = 6 老阴 ×（变爻）&emsp;两阴一阳 = 7 少阳 ⚊（不变）</p>
+  </details>
 </section>
 
-<!-- Coin Toss Area -->
 <section class="toss-area" id="tossArea">
   <div class="toss-progress" id="tossProgress">
     <div class="toss-dot" data-index="0">初</div>
@@ -530,14 +413,26 @@ body{
     <div class="toss-dot" data-index="5">上</div>
   </div>
 
-  <div class="coin-display" id="coinDisplay" onclick="tossCoin()">
-    <div class="coin" id="coin">
-      <div class="face heads"><span>☰</span><span class="face-label">阳</span></div>
-      <div class="face tails"><span>☷</span><span class="face-label">阴</span></div>
+  <div class="divination-mat">
+    <div class="coin-display" id="coinDisplay" onclick="tossCoin()">
+      <div class="coins" id="coins">
+        <div class="coin">
+          <div class="face heads"><span class="coin-mark">☰</span><span class="coin-label">阳</span></div>
+          <div class="face tails"><span class="coin-mark">☷</span><span class="coin-label">阴</span></div>
+        </div>
+        <div class="coin">
+          <div class="face heads"><span class="coin-mark">☰</span><span class="coin-label">阳</span></div>
+          <div class="face tails"><span class="coin-mark">☷</span><span class="coin-label">阴</span></div>
+        </div>
+        <div class="coin">
+          <div class="face heads"><span class="coin-mark">☰</span><span class="coin-label">阳</span></div>
+          <div class="face tails"><span class="coin-mark">☷</span><span class="coin-label">阴</span></div>
+        </div>
+      </div>
     </div>
+    <div class="current-toss-result" id="currentTossResult"></div>
   </div>
 
-  <div class="current-toss-result" id="currentTossResult"></div>
   <div>
     <button class="btn-toss" id="btnToss" onclick="tossCoin()">
       抛 掷 铜 钱
@@ -546,39 +441,35 @@ body{
   <div class="toss-status" id="tossStatus">请点击铜钱或按钮开始占卜</div>
 </section>
 
-<!-- Result Section -->
 <section class="result-section" id="resultSection">
   <div class="hexagram-display" id="hexagramDisplay"></div>
   <div id="interpretationCards"></div>
-  <div style="text-align:center;margin:24px 0">
+  <div style="text-align:center;margin:30px 0">
     <button class="btn-toss btn-reset" onclick="resetDivination()">
       重 新 占 卜
     </button>
   </div>
 </section>
 
-<!-- Empty State -->
 <div class="empty-state" id="emptyState">
   <div class="bagua-icon">
     <span>☰</span><span>☷</span><span>☵</span><span>☲</span>
     <span>☳</span><span>☶</span><span>☱</span><span>☴</span>
   </div>
-  <p>三枚铜钱定乾坤，六次抛掷见天机。点击上方铜钱，开始您的问卦之旅。</p>
+  <p>三枚铜钱定乾坤，六次抛掷见天机。<br>点击上方铜钱，开始您的问卦之旅。</p>
 </div>
 
 <footer class="footer">
-  六爻占卜 · 周易六十四卦 · 传统文化数字复兴<br>
+  <b>六爻占卜</b> · 周易六十四卦<br>
   《易》之为书也不可远，为道也屡迁，变动不居，周流六虚
 </footer>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<!-- Confirm Modal -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal">
-    <h3>⚠️ 确认清除</h3>
+    <h3>确认清除</h3>
     <p>确定要删除所有占卜记录吗？此操作不可撤销。</p>
     <div class="modal-btns">
       <button onclick="closeModal()">取消</button>
@@ -587,7 +478,6 @@ body{
   </div>
 </div>
 
-<!-- Auth Modal -->
 <div class="modal-overlay" id="authModal">
   <div class="modal">
     <div class="auth-tabs">
@@ -862,7 +752,7 @@ const dom = {
   sidebarToggle: $('#sidebarToggle'),
   historyList: $('#historyList'),
   tossProgress: $('#tossProgress'),
-  coin: $('#coin'),
+  coins: Array.from(document.querySelectorAll('.coin')),
   coinDisplay: $('#coinDisplay'),
   currentTossResult: $('#currentTossResult'),
   btnToss: $('#btnToss'),
@@ -1135,24 +1025,26 @@ function tossCoin() {
   dom.coinDisplay.style.pointerEvents = 'none';
   dom.tossStatus.textContent = '铜钱转动中……';
 
-  // Animate coin flip
-  dom.coin.classList.remove('flipping', 'result-yang', 'result-yin');
-  void dom.coin.offsetWidth; // reflow
-  dom.coin.classList.add('flipping');
+  // Animate all three coins flipping
+  dom.coins.forEach(c => {
+    c.classList.remove('flipping', 'result-yang', 'result-yin');
+    void c.offsetWidth; // reflow
+  });
+  dom.coins.forEach(c => c.classList.add('flipping'));
 
   // Generate result after animation
   setTimeout(() => {
     const result = generateToss();
     STATE.tosses.push(result);
 
-    // Settle coin on the correct face
-    dom.coin.classList.remove('flipping');
-    dom.coin.classList.remove('result-yang', 'result-yin');
-    const isYang = result.value === 7 || result.value === 9;
-    dom.coin.classList.add(isYang ? 'result-yang' : 'result-yin');
+    // Settle each coin on its face
+    dom.coins.forEach((c, i) => {
+      c.classList.remove('flipping', 'result-yang', 'result-yin');
+      c.classList.add(result.coins[i] === 1 ? 'result-yang' : 'result-yin');
+    });
 
-    // Show individual coin results
-    showCoinResults(result.coins);
+    // Show the resulting line
+    showCoinResults(result);
 
     // Update progress dot
     const dot = dom.tossDots[STATE.currentToss];
@@ -1212,19 +1104,19 @@ function getLineName(value) {
   }
 }
 
-function showCoinResults(coins) {
+function showCoinResults(result) {
   const container = dom.currentTossResult;
-  container.innerHTML = '<div class="coins-result">' +
-    coins.map((c, i) => `
-      <div class="coin-mini ${c === 1 ? 'heads' : 'tails'}" style="transition-delay:${i*0.15}s">
-        ${c === 1 ? '☰' : '☷'}
-      </div>
-    `).join('') +
+  const isYang = result.value === 7 || result.value === 9;
+  const glyph = isYang ? '⚊' : '⚋';
+  container.innerHTML = '<div class="toss-line-result">' +
+    '<span class="tlg">' + glyph + '</span>' +
+    '<span class="tln">' + getLineName(result.value) + '</span>' +
     '</div>';
 
   // Trigger animation
   requestAnimationFrame(() => {
-    container.querySelectorAll('.coin-mini').forEach(el => el.classList.add('show'));
+    const el = container.querySelector('.toss-line-result');
+    if (el) el.classList.add('show');
   });
 }
 
@@ -1260,6 +1152,7 @@ function updateTossUI() {
     dom.coinDisplay.style.pointerEvents = 'none';
     dom.tossStatus.textContent = '六爻已成';
   }
+  updateFlowProgress();
 }
 
 // ==================== DIVINATION COMPLETION ====================
@@ -1465,6 +1358,18 @@ function displayResult(reading) {
   });
 }
 
+function updateFlowProgress() {
+  const t = STATE.currentToss;
+  let done = 0, current = -1;
+  if (t === 0) { done = 0; current = 0; }
+  else if (t < 6) { done = 1; current = 1; }
+  else { done = 4; current = -1; }
+  document.querySelectorAll('#flowProgress .fp-node').forEach((n, i) => {
+    n.classList.toggle('active', i < done);
+    n.classList.toggle('current', i === current);
+  });
+}
+
 // ==================== RESET ====================
 function resetDivination() {
   STATE.tosses = [];
@@ -1482,7 +1387,7 @@ function resetDivination() {
   dom.currentTossResult.innerHTML = '';
   dom.hexagramDisplay.innerHTML = '';
   dom.interpretationCards.innerHTML = '';
-  dom.coin.classList.remove('flipping', 'result-yang', 'result-yin');
+  dom.coins.forEach(c => c.classList.remove('flipping', 'result-yang', 'result-yin'));
   // Reset all toss dots
   dom.tossDots = $$('.toss-dot');
   dom.tossDots.forEach((dot, i) => {
@@ -1491,6 +1396,7 @@ function resetDivination() {
     dot.title = '';
   });
   renderHistory();
+  updateFlowProgress();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
